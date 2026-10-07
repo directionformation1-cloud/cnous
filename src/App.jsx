@@ -63,7 +63,7 @@ function App() {
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main">Aller au contenu</a>
-      <div className="demo-ribbon">Site de démonstration — établissement fictif, aucune donnée bancaire collectée</div>
+      <div className="demo-ribbon">CAISSE ÉLAN — SITE DE DÉMONSTRATION · AUCUNE DONNÉE BANCAIRE COLLECTÉE</div>
 
       <header className="site-header">
         <div className="utility-bar wrap">
@@ -77,9 +77,9 @@ function App() {
         </div>
 
         <div className="main-header wrap">
-          <a className="brand" href="#main" aria-label="Élan Banque, accueil">
+          <a className="brand" href="#main" aria-label="Caisse Élan, accueil">
             <span className="brand-mark"><span></span><span></span><span></span></span>
-            <span>ÉLAN<small>banque</small></span>
+            <span className="brand-name"><span>CAISSE</span><strong>ÉLAN</strong><small>Banque & assurances</small></span>
           </a>
           <div className="header-tools">
             <button className="icon-link" type="button" aria-label="Rechercher"><Icon name="search"/><span>Rechercher</span></button>
@@ -118,42 +118,49 @@ function App() {
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">DEVENIR CLIENT</p>
-            <h1 id="hero-title">Un compte pensé pour avancer.</h1>
-            <p className="hero-lead">Ouvrez votre compte en ligne en quelques étapes et profitez d’un accompagnement humain quand vous en avez besoin.</p>
-            <button className="button button-light" type="button" onClick={showDemo}>Découvrir le parcours <Icon name="arrow" size={18}/></button>
-            <p className="hero-note"><Icon name="clock" size={18}/> Préparation en 10 minutes environ</p>
+            <h1 id="hero-title">Ouvrir un compte bancaire</h1>
+            <p className="hero-lead">Devenez client Caisse Élan simplement, en ligne ou en agence, et choisissez les services adaptés à votre quotidien.</p>
+            <button className="button button-light" type="button" onClick={showDemo}>Ouvrir mon compte en ligne <Icon name="arrow" size={18}/></button>
+            <p className="hero-note"><Icon name="clock" size={18}/> Une démarche simple en quelques minutes</p>
           </div>
           <div className="hero-media">
             <img src={heroImage} alt="Une cliente consulte son téléphone dans un café" />
             <div className="hero-card" aria-hidden="true">
               <div className="mini-brand">é.</div>
               <div className="chip"></div>
-              <span>ÉLAN</span><b>VISA</b>
+              <span>CAISSE ÉLAN</span><b>VISA</b>
             </div>
           </div>
         </section>
 
+        <nav className="service-shortcuts wrap" aria-label="Accès rapides aux services">
+          <a href="#comptes"><span><Icon name="card" size={25}/></span><div><strong>Gérer mes comptes</strong><small>Comptes et cartes</small></div><Icon name="arrow" size={17}/></a>
+          <a href="#epargner"><span><Icon name="heart" size={25}/></span><div><strong>Épargner</strong><small>Préparer mes projets</small></div><Icon name="arrow" size={17}/></a>
+          <a href="#emprunter"><span><Icon name="document" size={25}/></span><div><strong>Emprunter</strong><small>Financer mes envies</small></div><Icon name="arrow" size={17}/></a>
+          <a href="#assurer"><span><Icon name="shield" size={25}/></span><div><strong>M’assurer</strong><small>Protéger ce qui compte</small></div><Icon name="arrow" size={17}/></a>
+        </nav>
+
         <section className="choice-section section wrap" id="comptes">
           <div className="section-heading">
             <p className="eyebrow red">OUVRIR UN COMPTE</p>
-            <h2>À vous de choisir le chemin</h2>
-            <p>En autonomie depuis chez vous, ou accompagné en agence : commencez comme vous le souhaitez.</p>
+            <h2>Comment souhaitez-vous ouvrir votre compte&nbsp;?</h2>
+            <p>Depuis chez vous ou avec l’aide d’un conseiller, choisissez le parcours qui vous convient.</p>
           </div>
           <div className="choice-grid">
             <article className="choice-card red-card">
               <span className="choice-icon"><Icon name="mobile" size={30}/></span>
               <div>
                 <p className="label">100 % EN LIGNE</p>
-                <h3>J’ouvre mon compte où je veux</h3>
-                <p>Un parcours guidé, disponible à tout moment, depuis votre mobile ou votre ordinateur.</p>
-                <button className="text-link" type="button" onClick={showDemo}>Commencer en ligne <Icon name="arrow" size={18}/></button>
+                <h3>Ouvrir un compte en ligne</h3>
+                <p>Un parcours guidé, disponible à tout moment depuis votre mobile ou votre ordinateur.</p>
+                <button className="text-link" type="button" onClick={showDemo}>Ouvrir mon compte <Icon name="arrow" size={18}/></button>
               </div>
             </article>
             <article className="choice-card dark-card">
               <span className="choice-icon"><Icon name="chat" size={30}/></span>
               <div>
                 <p className="label">AVEC UN CONSEILLER</p>
-                <h3>Je préfère être accompagné</h3>
+                <h3>Ouvrir un compte en agence</h3>
                 <p>Rencontrez un conseiller pour préciser votre projet et choisir ensemble votre formule.</p>
                 <a className="text-link" href="#contact">Prendre rendez-vous <Icon name="arrow" size={18}/></a>
               </div>
@@ -165,7 +172,7 @@ function App() {
           <div className="wrap">
             <div className="section-heading light-heading">
               <p className="eyebrow">SIMPLE ET GUIDÉ</p>
-              <h2 id="steps-title">Votre nouveau compte en quatre étapes</h2>
+              <h2 id="steps-title">Ouvrez votre compte en quatre étapes</h2>
             </div>
             <ol className="steps-grid">
               {steps.map(([num, title, text]) => (
@@ -228,7 +235,7 @@ function App() {
 
         <section className="contact-section" id="contact">
           <div className="wrap contact-inner">
-            <div><p className="eyebrow">ON EN PARLE ?</p><h2>Un projet commence souvent par une conversation.</h2></div>
+              <div><p className="eyebrow">CAISSE ÉLAN VOUS ACCOMPAGNE</p><h2>Un projet commence souvent par une conversation.</h2></div>
             <a className="button button-light" href="mailto:bonjour@example.test">Contacter une agence <Icon name="arrow" size={18}/></a>
           </div>
         </section>
@@ -236,11 +243,11 @@ function App() {
 
       <footer className="footer">
         <div className="wrap footer-top">
-          <a className="brand brand-footer" href="#main"><span className="brand-mark"><span></span><span></span><span></span></span><span>ÉLAN<small>banque</small></span></a>
+          <a className="brand brand-footer" href="#main"><span className="brand-mark"><span></span><span></span><span></span></span><span className="brand-name"><span>CAISSE</span><strong>ÉLAN</strong><small>Banque & assurances</small></span></a>
           <div className="footer-links"><a href="#faq">Aide & accessibilité</a><a href="#contact">Trouver une agence</a><a href="#main">Tarifs</a><a href="#main">Informations légales</a></div>
           <div className="socials"><a href="#main" aria-label="Instagram"><Icon name="instagram"/></a><a href="#main" aria-label="LinkedIn"><Icon name="linkedin"/></a></div>
         </div>
-        <div className="wrap footer-bottom"><p>© 2026 Élan Banque — Démonstration créative, sans affiliation avec un établissement réel.</p><span><Icon name="shield" size={17}/> Votre sécurité, notre priorité</span></div>
+        <div className="wrap footer-bottom"><p>© 2026 Caisse Élan — Démonstration créative, sans affiliation avec un établissement réel.</p><span><Icon name="shield" size={17}/> Votre sécurité, notre priorité</span></div>
       </footer>
 
       <a className="floating-contact" href="#contact"><Icon name="chat"/><span>Nous contacter</span></a>
