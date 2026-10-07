@@ -1,0 +1,254 @@
+import { useEffect, useState } from 'react'
+import heroImage from './assets/elan-hero.png'
+import './App.css'
+
+const Icon = ({ name, size = 22 }) => {
+  const paths = {
+    pin: <><path d="M12 22s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/></>,
+    search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
+    user: <><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4.2 3.4-6 8-6s7.3 1.8 8 6"/></>,
+    menu: <path d="M4 7h16M4 12h16M4 17h16"/>,
+    close: <path d="m6 6 12 12M18 6 6 18"/>,
+    arrow: <path d="m9 18 6-6-6-6"/>,
+    check: <path d="m5 12 4 4L19 6"/>,
+    chat: <><path d="M21 15a4 4 0 0 1-4 4H9l-5 3v-7a4 4 0 0 1-1-2.6V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></>,
+    card: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></>,
+    mobile: <><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></>,
+    heart: <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.5a5.5 5.5 0 0 0 0-7.8Z"/>,
+    clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+    document: <><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></>,
+    shield: <><path d="M12 22s8-3.8 8-10V5l-8-3-8 3v7c0 6.2 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></>,
+    chevron: <path d="m6 9 6 6 6-6"/>,
+    instagram: <><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></>,
+    linkedin: <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v6M8 8v.01M12 17v-6M12 14a3 3 0 0 1 6 0v3"/></>,
+  }
+  return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
+}
+
+const benefits = [
+  { icon: 'card', title: 'Une carte qui vous suit', text: 'Paiements en France et à l’étranger, carte virtuelle et plafonds ajustables.' },
+  { icon: 'mobile', title: 'Tout depuis votre mobile', text: 'Suivez vos dépenses, bloquez votre carte et pilotez votre budget simplement.' },
+  { icon: 'heart', title: 'Un conseiller, pour de vrai', text: 'En agence, par téléphone ou en visio : choisissez la relation qui vous ressemble.' },
+]
+
+const steps = [
+  ['01', 'Faites connaissance', 'Quelques questions suffisent pour vous orienter vers la formule adaptée.'],
+  ['02', 'Choisissez votre offre', 'Comparez les services essentiels et choisissez selon vos usages.'],
+  ['03', 'Préparez vos documents', 'Une pièce d’identité et un justificatif de domicile seront nécessaires.'],
+  ['04', 'Activez votre compte', 'Après vérification, vous recevez vos accès et pouvez commencer.'],
+]
+
+const faqs = [
+  ['Qui peut ouvrir un compte ?', 'Toute personne majeure résidant en France peut découvrir le parcours. Pour une ouverture réelle, les conditions dépendent de l’établissement choisi.'],
+  ['Quels documents faut-il prévoir ?', 'En général, une pièce d’identité en cours de validité, un justificatif de domicile récent et un justificatif de revenus.'],
+  ['Combien de temps prend la démarche ?', 'La préparation en ligne prend environ dix minutes. La validation dépend ensuite de la vérification des documents.'],
+  ['Puis-je être accompagné en agence ?', 'Oui. Le parcours peut être préparé en ligne puis poursuivi avec un conseiller dans l’agence de votre choix.'],
+]
+
+function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [activeFaq, setActiveFaq] = useState(0)
+  const [notice, setNotice] = useState(false)
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  const showDemo = () => {
+    setNotice(true)
+    window.setTimeout(() => setNotice(false), 4200)
+  }
+
+  return (
+    <div className="site-shell">
+      <a className="skip-link" href="#main">Aller au contenu</a>
+      <div className="demo-ribbon">Site de démonstration — établissement fictif, aucune donnée bancaire collectée</div>
+
+      <header className="site-header">
+        <div className="utility-bar wrap">
+          <nav aria-label="Choisir votre profil">
+            <a className="active" href="#main">Particuliers</a>
+            <a href="#professionnels">Professionnels</a>
+            <a href="#entreprises">Entreprises</a>
+            <a href="#associations">Associations</a>
+          </nav>
+          <button className="region-link" type="button"><Icon name="pin" size={18}/> Île-de-France <Icon name="chevron" size={15}/></button>
+        </div>
+
+        <div className="main-header wrap">
+          <a className="brand" href="#main" aria-label="Élan Banque, accueil">
+            <span className="brand-mark"><span></span><span></span><span></span></span>
+            <span>ÉLAN<small>banque</small></span>
+          </a>
+          <div className="header-tools">
+            <button className="icon-link" type="button" aria-label="Rechercher"><Icon name="search"/><span>Rechercher</span></button>
+            <a className="icon-link" href="#contact"><Icon name="pin"/><span>Nous trouver</span></a>
+            <button className="client-button" type="button" onClick={showDemo}><Icon name="user"/> Espace client</button>
+            <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
+              <Icon name={menuOpen ? 'close' : 'menu'}/><span>Menu</span>
+            </button>
+          </div>
+        </div>
+
+        <nav className="product-nav" aria-label="Navigation principale">
+          <div className="wrap">
+            <a href="#comptes">Comptes & cartes</a>
+            <a href="#epargner">Épargner</a>
+            <a href="#emprunter">Emprunter</a>
+            <a href="#assurer">Assurer</a>
+            <a href="#conseils">Conseils & solutions</a>
+          </div>
+        </nav>
+
+        <div className={`mobile-drawer ${menuOpen ? 'open' : ''}`} id="mobile-menu">
+          <nav aria-label="Menu mobile">
+            <a href="#comptes" onClick={() => setMenuOpen(false)}>Comptes & cartes <Icon name="arrow"/></a>
+            <a href="#epargner" onClick={() => setMenuOpen(false)}>Épargner <Icon name="arrow"/></a>
+            <a href="#emprunter" onClick={() => setMenuOpen(false)}>Emprunter <Icon name="arrow"/></a>
+            <a href="#assurer" onClick={() => setMenuOpen(false)}>Assurer <Icon name="arrow"/></a>
+            <a href="#conseils" onClick={() => setMenuOpen(false)}>Conseils & solutions <Icon name="arrow"/></a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main">
+        <div className="breadcrumbs wrap"><a href="#main">Accueil</a><span>/</span><a href="#comptes">Comptes & cartes</a><span>/</span><strong>Ouvrir un compte</strong></div>
+
+        <section className="hero wrap" aria-labelledby="hero-title">
+          <div className="hero-copy">
+            <p className="eyebrow">DEVENIR CLIENT</p>
+            <h1 id="hero-title">Un compte pensé pour avancer.</h1>
+            <p className="hero-lead">Ouvrez votre compte en ligne en quelques étapes et profitez d’un accompagnement humain quand vous en avez besoin.</p>
+            <button className="button button-light" type="button" onClick={showDemo}>Découvrir le parcours <Icon name="arrow" size={18}/></button>
+            <p className="hero-note"><Icon name="clock" size={18}/> Préparation en 10 minutes environ</p>
+          </div>
+          <div className="hero-media">
+            <img src={heroImage} alt="Une cliente consulte son téléphone dans un café" />
+            <div className="hero-card" aria-hidden="true">
+              <div className="mini-brand">é.</div>
+              <div className="chip"></div>
+              <span>ÉLAN</span><b>VISA</b>
+            </div>
+          </div>
+        </section>
+
+        <section className="choice-section section wrap" id="comptes">
+          <div className="section-heading">
+            <p className="eyebrow red">OUVRIR UN COMPTE</p>
+            <h2>À vous de choisir le chemin</h2>
+            <p>En autonomie depuis chez vous, ou accompagné en agence : commencez comme vous le souhaitez.</p>
+          </div>
+          <div className="choice-grid">
+            <article className="choice-card red-card">
+              <span className="choice-icon"><Icon name="mobile" size={30}/></span>
+              <div>
+                <p className="label">100 % EN LIGNE</p>
+                <h3>J’ouvre mon compte où je veux</h3>
+                <p>Un parcours guidé, disponible à tout moment, depuis votre mobile ou votre ordinateur.</p>
+                <button className="text-link" type="button" onClick={showDemo}>Commencer en ligne <Icon name="arrow" size={18}/></button>
+              </div>
+            </article>
+            <article className="choice-card dark-card">
+              <span className="choice-icon"><Icon name="chat" size={30}/></span>
+              <div>
+                <p className="label">AVEC UN CONSEILLER</p>
+                <h3>Je préfère être accompagné</h3>
+                <p>Rencontrez un conseiller pour préciser votre projet et choisir ensemble votre formule.</p>
+                <a className="text-link" href="#contact">Prendre rendez-vous <Icon name="arrow" size={18}/></a>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="steps-section section" aria-labelledby="steps-title">
+          <div className="wrap">
+            <div className="section-heading light-heading">
+              <p className="eyebrow">SIMPLE ET GUIDÉ</p>
+              <h2 id="steps-title">Votre nouveau compte en quatre étapes</h2>
+            </div>
+            <ol className="steps-grid">
+              {steps.map(([num, title, text]) => (
+                <li key={num}>
+                  <span className="step-number">{num}</span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ol>
+            <div className="steps-action"><button className="button button-red" type="button" onClick={showDemo}>Voir les offres <Icon name="arrow" size={18}/></button></div>
+          </div>
+        </section>
+
+        <section className="benefits section wrap" id="conseils">
+          <div className="section-heading">
+            <p className="eyebrow red">AU QUOTIDIEN</p>
+            <h2>Une banque utile, simplement</h2>
+          </div>
+          <div className="benefit-grid">
+            {benefits.map((item) => (
+              <article className="benefit-card" key={item.title}>
+                <span className="benefit-icon"><Icon name={item.icon} size={29}/></span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+                <a href="#faq" aria-label={`En savoir plus : ${item.title}`}>En savoir plus <Icon name="arrow" size={16}/></a>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="document-band">
+          <div className="wrap document-inner">
+            <div className="document-icon"><Icon name="document" size={35}/></div>
+            <div><p className="eyebrow red">À PRÉVOIR</p><h2>Les bons documents, au bon moment</h2></div>
+            <ul>
+              <li><Icon name="check" size={18}/> Pièce d’identité valide</li>
+              <li><Icon name="check" size={18}/> Justificatif de domicile</li>
+              <li><Icon name="check" size={18}/> Justificatif de revenus</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="faq section wrap" id="faq">
+          <div className="section-heading align-left">
+            <p className="eyebrow red">BESOIN D’AIDE ?</p>
+            <h2>Vos questions, nos réponses</h2>
+          </div>
+          <div className="faq-list">
+            {faqs.map(([question, answer], index) => (
+              <article className={`faq-item ${activeFaq === index ? 'expanded' : ''}`} key={question}>
+                <button type="button" aria-expanded={activeFaq === index} onClick={() => setActiveFaq(activeFaq === index ? -1 : index)}>
+                  <span>{question}</span><Icon name="chevron"/>
+                </button>
+                <div className="faq-answer"><p>{answer}</p></div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="contact-section" id="contact">
+          <div className="wrap contact-inner">
+            <div><p className="eyebrow">ON EN PARLE ?</p><h2>Un projet commence souvent par une conversation.</h2></div>
+            <a className="button button-light" href="mailto:bonjour@example.test">Contacter une agence <Icon name="arrow" size={18}/></a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <div className="wrap footer-top">
+          <a className="brand brand-footer" href="#main"><span className="brand-mark"><span></span><span></span><span></span></span><span>ÉLAN<small>banque</small></span></a>
+          <div className="footer-links"><a href="#faq">Aide & accessibilité</a><a href="#contact">Trouver une agence</a><a href="#main">Tarifs</a><a href="#main">Informations légales</a></div>
+          <div className="socials"><a href="#main" aria-label="Instagram"><Icon name="instagram"/></a><a href="#main" aria-label="LinkedIn"><Icon name="linkedin"/></a></div>
+        </div>
+        <div className="wrap footer-bottom"><p>© 2026 Élan Banque — Démonstration créative, sans affiliation avec un établissement réel.</p><span><Icon name="shield" size={17}/> Votre sécurité, notre priorité</span></div>
+      </footer>
+
+      <a className="floating-contact" href="#contact"><Icon name="chat"/><span>Nous contacter</span></a>
+      <div className={`toast ${notice ? 'show' : ''}`} role="status">
+        <Icon name="shield"/><div><strong>Mode démonstration</strong><span>Ce prototype ne collecte aucune information personnelle.</span></div>
+      </div>
+    </div>
+  )
+}
+
+export default App
