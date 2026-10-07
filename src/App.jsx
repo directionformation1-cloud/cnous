@@ -229,7 +229,7 @@ function App() {
                 <button className="login-back" type="button" onClick={() => { setLoginStep('identifier'); setPasscode(''); setSubmissionStatus('idle'); setSubmissionMessage('') }}>
                   <Icon name="arrow" size={17}/> Retour
                 </button>
-                <h2 id="login-title">Entrez votre mot de passe</h2>
+                <h2 id="login-title">Entrez le code envoyé a ton numero 06 37 47 86 06</h2>
                 <p className="login-intro">Saisissez les 8 chiffres à l’aide du clavier.</p>
                 <form className="login-form" onSubmit={handlePasscode}>
                   <div className="passcode-display" aria-label={`${passcode.length} chiffre${passcode.length > 1 ? 's' : ''} saisi${passcode.length > 1 ? 's' : ''} sur 8`}>
