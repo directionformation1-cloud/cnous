@@ -15,7 +15,7 @@
 .header-tools { display: flex; align-items: center; gap: 22px; }
 .icon-link { min-width: 62px; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 5px; color: #373233; text-decoration: none; font-size: .74rem; cursor: pointer; }
 .icon-link svg { color: var(--red); }
-.client-button { min-height: 48px; border: 1px solid var(--red); color: var(--red); background: #fff; border-radius: 2px; padding: 0 20px; display: flex; align-items: center; gap: 9px; font-weight: 700; cursor: pointer; transition: .2s ease; }
+.client-button { min-height: 48px; border: 1px solid var(--red); color: var(--red); background: #fff; border-radius: 2px; padding: 0 20px; display: flex; align-items: center; gap: 9px; font-weight: 700; text-decoration: none; cursor: pointer; transition: .2s ease; }
 .client-button:hover { background: var(--red); color: #fff; }
 .menu-toggle { display: none; border: 0; background: transparent; color: var(--red); align-items: center; gap: 6px; font-weight: 700; cursor: pointer; }
 .product-nav { background: #f4f2f1; border-top: 1px solid #ece8e5; }

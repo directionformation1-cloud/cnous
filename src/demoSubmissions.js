@@ -5,7 +5,6 @@ import {
   orderBy,
   query,
   runTransaction,
-  serverTimestamp,
   updateDoc,
 } from 'firebase/firestore'
 import { db } from './firebase'

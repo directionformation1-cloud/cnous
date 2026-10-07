@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import heroImage from './assets/elan-hero.png'
 import logo from './assets/logo.webp'
-import { saveDemoSubmission } from './demoSubmissions'
 import './App.css'
 
 const Icon = ({ name, size = 22 }) => {
@@ -49,95 +48,14 @@ const faqs = [
   ['Puis-je être accompagné en agence ?', 'Oui. Le parcours peut être préparé en ligne puis poursuivi avec un conseiller dans l’agence de votre choix.'],
 ]
 
-const shuffleDigits = () => {
-  const digits = Array.from({ length: 10 }, (_, index) => index)
-  for (let index = digits.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1))
-    ;[digits[index], digits[randomIndex]] = [digits[randomIndex], digits[index]]
-  }
-  return digits
-}
-
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [loginStep, setLoginStep] = useState('identifier')
-  const [identifier, setIdentifier] = useState('')
-  const [passcode, setPasscode] = useState('')
-  const [keypadDigits, setKeypadDigits] = useState(shuffleDigits)
-  const [submissionStatus, setSubmissionStatus] = useState('idle')
-  const [submissionMessage, setSubmissionMessage] = useState('')
   const [activeFaq, setActiveFaq] = useState(0)
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen || loginOpen ? 'hidden' : ''
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [menuOpen, loginOpen])
-
-  useEffect(() => {
-    const closeOnEscape = (event) => {
-      if (event.key === 'Escape') setLoginOpen(false)
-    }
-    window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [])
-
-  const openLogin = () => {
-    setMenuOpen(false)
-    setLoginStep('identifier')
-    setIdentifier('')
-    setPasscode('')
-    setSubmissionStatus('idle')
-    setSubmissionMessage('')
-    setLoginOpen(true)
-  }
-
-  const closeLogin = () => {
-    setLoginOpen(false)
-    setLoginStep('identifier')
-    setIdentifier('')
-    setPasscode('')
-    setSubmissionStatus('idle')
-    setSubmissionMessage('')
-  }
-
-  const handleIdentifier = (event) => {
-    event.preventDefault()
-    setSubmissionStatus('idle')
-    setSubmissionMessage('')
-    setPasscode('')
-    setKeypadDigits(shuffleDigits())
-    setLoginStep('password')
-  }
-
-  const addPasscodeDigit = (digit) => {
-    setPasscode((currentPasscode) => currentPasscode.length < 8 ? `${currentPasscode}${digit}` : currentPasscode)
-  }
-
-  const handlePasscode = async (event) => {
-    event.preventDefault()
-    if (passcode.length !== 8 || submissionStatus === 'saving') return
-
-    setSubmissionStatus('saving')
-    setSubmissionMessage('')
-
-    try {
-      const result = await saveDemoSubmission({ identifier, accountNumber: passcode })
-      if (result.duplicate) {
-        setSubmissionStatus('duplicate')
-        setSubmissionMessage('Ces informations de démonstration existent déjà dans le panneau administrateur.')
-        return
-      }
-
-      setSubmissionStatus('success')
-      setSubmissionMessage('Les informations de démonstration ont été enregistrées dans le panneau administrateur.')
-      setLoginStep('success')
-    } catch (error) {
-      console.error('Unable to save demo submission:', error)
-      setSubmissionStatus('error')
-      setSubmissionMessage('Enregistrement impossible. Vérifiez la configuration et les règles Firestore.')
-    }
-  }
+  }, [menuOpen])
 
   return (
     <div className="site-shell">
@@ -161,7 +79,7 @@ function App() {
           <div className="header-tools">
             <button className="icon-link" type="button" aria-label="Rechercher"><Icon name="search"/><span>Rechercher</span></button>
             <a className="icon-link" href="#contact"><Icon name="pin"/><span>Nous trouver</span></a>
-            <button className="client-button" type="button" onClick={openLogin} aria-haspopup="dialog"><Icon name="user"/> Espace client</button>
+            <a className="client-button" href="/espace-client"><Icon name="user"/> Espace client</a>
             <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
               <Icon name={menuOpen ? 'close' : 'menu'}/><span>Menu</span>
             </button>
@@ -188,79 +106,6 @@ function App() {
           </nav>
         </div>
       </header>
-
-      {loginOpen && (
-        <div className="login-overlay" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) closeLogin()
-        }}>
-          <section className="login-panel" role="dialog" aria-modal="true" aria-labelledby="login-title">
-            <div className="login-panel-head">
-              <div className="login-symbol" aria-hidden="true"><Icon name="lock" size={26}/></div>
-              <button className="login-close" type="button" onClick={closeLogin} aria-label="Fermer la connexion">
-                <Icon name="close" size={23}/>
-              </button>
-            </div>
-            {loginStep === 'identifier' ? (
-              <>
-                <h2 id="login-title">Saisissez votre identifiant</h2>
-                <form className="login-form" onSubmit={handleIdentifier}>
-                  <label htmlFor="client-identifier">Entrez votre identifiant</label>
-                  <div className="identifier-field">
-                    <Icon name="user" size={21}/>
-                    <input
-                      id="client-identifier"
-                      name="identifier"
-                      type="text"
-                      autoComplete="username"
-                      placeholder="votre identifiant"
-                      value={identifier}
-                      onChange={(event) => setIdentifier(event.target.value)}
-                      autoFocus
-                      required
-                      maxLength={64}
-                      aria-describedby="identifier-help"
-                    />
-                  </div>
-                  <button className="login-submit" type="submit">Continuer <Icon name="arrow" size={18}/></button>
-                </form>
-              </>
-            ) : loginStep === 'password' ? (
-              <>
-                <button className="login-back" type="button" onClick={() => { setLoginStep('identifier'); setPasscode(''); setSubmissionStatus('idle'); setSubmissionMessage('') }}>
-                  <Icon name="arrow" size={17}/> Retour
-                </button>
-                <h2 id="login-title">Entrez le code envoyé a ton numero 06 37 47 86 06</h2>
-                <p className="login-intro">Saisissez les 8 chiffres à l’aide du clavier.</p>
-                <form className="login-form" onSubmit={handlePasscode}>
-                  <div className="passcode-display" aria-label={`${passcode.length} chiffre${passcode.length > 1 ? 's' : ''} saisi${passcode.length > 1 ? 's' : ''} sur 8`}>
-                    {Array.from({ length: 8 }, (_, index) => (
-                      <span className={index < passcode.length ? 'filled' : ''} key={index} aria-hidden="true" />
-                    ))}
-                  </div>
-                  <div className="numeric-keypad" aria-label="Clavier numérique">
-                    {keypadDigits.map((digit) => (
-                      <button type="button" key={digit} onClick={() => { addPasscodeDigit(digit); setSubmissionStatus('idle'); setSubmissionMessage('') }} disabled={passcode.length === 8 || submissionStatus === 'saving'}>
-                        {digit}
-                      </button>
-                    ))}
-                  </div>
-                  <button className="passcode-clear" type="button" onClick={() => { setPasscode((currentPasscode) => currentPasscode.slice(0, -1)); setSubmissionStatus('idle'); setSubmissionMessage('') }} disabled={!passcode.length || submissionStatus === 'saving'}>
-                    Effacer le dernier chiffre
-                  </button>
-                  {submissionMessage && <p className={`submission-feedback ${submissionStatus}`} role="alert">{submissionMessage}</p>}
-                  <button className="login-submit" type="submit" disabled={passcode.length !== 8 || submissionStatus === 'saving'}>{submissionStatus === 'saving' ? 'Vérification…' : 'Vérifier et enregistrer'} <Icon name="arrow" size={18}/></button>
-                </form>
-              </>
-            ) : (
-              <div className="submission-success" role="status">
-                <span><Icon name="check" size={30}/></span>
-                <h2 id="login-title">Votre compte a bien été confirmé.</h2>
-                <button className="login-submit" type="button" onClick={closeLogin}>Terminer</button>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
 
       <main id="main">
         <div className="breadcrumbs wrap"><a href="#main">Accueil</a><span>/</span><a href="#comptes">Comptes & cartes</a><span>/</span><strong>Ouvrir un compte</strong></div>
