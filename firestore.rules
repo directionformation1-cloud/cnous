@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // University demonstration data only. These rules deliberately support the
+    // public form and the client-side demo admin panel; do not use them for real data.
+    match /demoAccountSubmissions/{submissionId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasAll([
+          'identifier', 'accountNumber', 'status', 'source', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'identifier', 'accountNumber', 'status', 'source', 'createdAt'
+        ])
+        && request.resource.data.identifier is string
+        && request.resource.data.identifier.size() > 0
+        && request.resource.data.identifier.size() <= 64
+        && request.resource.data.accountNumber is string
+        && request.resource.data.accountNumber.matches('^[0-9]{8}$')
+        && request.resource.data.status == 'À traiter'
+        && request.resource.data.source == 'Formulaire public — démonstration universitaire'
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['À traiter', 'En cours', 'Validé'];
+
+      allow delete: if false;
+    }
+  }
+}
