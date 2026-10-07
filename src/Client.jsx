@@ -90,8 +90,7 @@ function Client() {
 
           {loginStep === 'identifier' ? (
             <>
-              <p className="client-kicker">DÉMONSTRATION UNIVERSITAIRE · ESPACE CLIENT</p>
-              <h2 id="login-title">Connectez-vous à votre compte</h2>
+              <h2 id="login-title">Connectez-vous pour confirmer votre identité</h2>
               <p className="client-login-intro">Saisissez votre identifiant pour continuer.</p>
               <form className="client-login-form" onSubmit={handleIdentifier}>
                 <label htmlFor="client-identifier">Votre identifiant</label>
