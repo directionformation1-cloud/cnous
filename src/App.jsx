@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import heroImage from './assets/elan-hero.png'
 import logo from './assets/logo.webp'
 import './App.css'
@@ -25,7 +26,12 @@ const Icon = ({ name, size = 22 }) => {
     lock: <><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></>,
     help: <><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 1 1 3.4 2.2c-.8.4-1.2.9-1.2 1.8M12 17h.01"/></>,
   }
-  return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
+
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {paths[name]}
+    </svg>
+  )
 }
 
 const benefits = [
@@ -230,7 +236,7 @@ function App() {
 
         <section className="contact-section" id="contact">
           <div className="wrap contact-inner">
-              <div><p className="eyebrow">CAISSSE D'EPARGNE VOUS ACCOMPAGNE</p><h2>Un projet commence souvent par une conversation.</h2></div>
+            <div><p className="eyebrow">CAISSSE D'EPARGNE VOUS ACCOMPAGNE</p><h2>Un projet commence souvent par une conversation.</h2></div>
             <a className="button button-light" href="mailto:bonjour@example.test">Contacter une agence <Icon name="arrow" size={18}/></a>
           </div>
         </section>
@@ -246,6 +252,8 @@ function App() {
       </footer>
 
       <a className="floating-contact" href="#contact"><Icon name="chat"/><span>Nous contacter</span></a>
+
+      <Analytics />
     </div>
   )
 }
