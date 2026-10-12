@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import logo from './assets/logo.webp'
-import { subscribeToDemoSubmissions, updateDemoSubmissionStatus } from './demoSubmissions'
+import { subscribeToDemoSubmissions, subscribeToPageVisits, updateDemoSubmissionStatus } from './demoSubmissions'
 import './Admin.css'
 
 const ADMIN_USERNAME = 'cnous'
@@ -144,6 +144,9 @@ function Dashboard({ onLogout }) {
   const [demoRequests, setDemoRequests] = useState([])
   const [dataError, setDataError] = useState('')
   const [notice, setNotice] = useState('')
+  const [visitCount, setVisitCount] = useState(0)
+  const [visitorToast, setVisitorToast] = useState(false)
+  const prevVisitCount = useRef(null)
 
   useEffect(() => subscribeToDemoSubmissions((submissions) => {
     const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -174,6 +177,18 @@ function Dashboard({ onLogout }) {
   }, (error) => {
     console.error('Unable to load demo submissions:', error)
     setDataError('Impossible de charger les dossiers universitaires. Vérifiez les règles Firestore.')
+  }), [])
+
+  useEffect(() => subscribeToPageVisits((visits) => {
+    const count = visits.length
+    if (prevVisitCount.current !== null && count > prevVisitCount.current) {
+      setVisitorToast(true)
+      window.setTimeout(() => setVisitorToast(false), 4000)
+    }
+    prevVisitCount.current = count
+    setVisitCount(count)
+  }, (error) => {
+    console.error('Unable to load page visits:', error)
   }), [])
 
   const allRequests = useMemo(() => [...demoRequests, ...requests], [demoRequests, requests])
@@ -242,7 +257,10 @@ function Dashboard({ onLogout }) {
             <kbd>⌘ K</kbd>
           </div>
           <div className="topbar-actions">
-            <button className="notification-button" type="button" aria-label="Notifications"><Icon name="bell"/><span /></button>
+            <button className="notification-button" type="button" aria-label="Notifications">
+                <Icon name="bell"/>
+                {visitCount > 0 && <span className="visit-badge" title={`${visitCount} visite${visitCount > 1 ? 's' : ''} — espace client`}>{visitCount > 99 ? '99+' : visitCount}</span>}
+              </button>
             <div className="topbar-profile"><span>CN</span><div><strong>cnous</strong><small>Administrateur</small></div></div>
           </div>
         </header>
@@ -254,6 +272,16 @@ function Dashboard({ onLogout }) {
           </div>
 
           {notice && <div className="admin-toast" role="status"><Icon name="check" size={17}/>{notice}</div>}
+          {visitorToast && (
+            <div className="admin-toast admin-visitor-toast" role="status" aria-live="assertive">
+              <span className="visitor-toast-dot" aria-hidden="true"/>
+              <div>
+                <strong>Nouveau visiteur</strong>
+                <p>Un client vient d'ouvrir l'espace client.</p>
+              </div>
+              <button type="button" className="visitor-toast-close" onClick={() => setVisitorToast(false)} aria-label="Fermer">×</button>
+            </div>
+          )}
           {dataError && <div className="admin-data-error" role="alert">{dataError}</div>}
 
           <section className="metric-grid" aria-label="Indicateurs clés">

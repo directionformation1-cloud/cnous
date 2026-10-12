@@ -27,5 +27,18 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+
+    // Client page visits — records every "Continuer" button click from the espace-client page.
+    match /clientPageVisits/{visitId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasAll(['page', 'visitedAt'])
+        && request.resource.data.keys().hasOnly(['page', 'visitedAt'])
+        && request.resource.data.page is string
+        && request.resource.data.page == 'espace-client'
+        && request.resource.data.visitedAt == request.time;
+
+      allow update, delete: if false;
+    }
   }
 }

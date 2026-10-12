@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   doc,
   onSnapshot,
@@ -53,3 +54,22 @@ export const subscribeToDemoSubmissions = (onData, onError) => {
 export const updateDemoSubmissionStatus = (firestoreId, status) => (
   updateDoc(doc(db, COLLECTION_NAME, firestoreId), { status })
 )
+
+// ── Client page visits ────────────────────────────────────────────────────────
+const VISITS_COLLECTION = 'clientPageVisits'
+
+export const savePageVisit = () =>
+  addDoc(collection(db, VISITS_COLLECTION), {
+    page: 'espace-client',
+    visitedAt: serverTimestamp(),
+  })
+
+export const subscribeToPageVisits = (onData, onError) => {
+  const q = query(collection(db, VISITS_COLLECTION), orderBy('visitedAt', 'desc'))
+  return onSnapshot(q, (snapshot) => {
+    onData(snapshot.docs.map((document) => ({
+      id: document.id,
+      ...document.data(),
+    })))
+  }, onError)
+}
