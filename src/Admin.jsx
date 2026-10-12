@@ -77,7 +77,7 @@ function Login({ onSuccess }) {
         </a>
         <div className="login-aside-copy">
           <span className="login-secure-pill"><Icon name="lock" size={15}/> Accès sécurisé</span>
-          <h1>Pilotez votre activité en toute simplicité.</h1>
+          <h1>Pilotez   votre activité en toute simplicité.</h1>
           <p>Suivez les demandes, accompagnez vos clients et gardez une vue claire sur l’activité de votre espace.</p>
         </div>
         <p className="login-aside-foot">Espace réservé aux administrateurs autorisés.</p>
