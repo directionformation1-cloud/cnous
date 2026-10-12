@@ -5,6 +5,7 @@ import {
   orderBy,
   query,
   runTransaction,
+  serverTimestamp,
   updateDoc,
 } from 'firebase/firestore'
 import { db } from './firebase'
@@ -26,7 +27,13 @@ export const saveDemoSubmission = async ({ identifier, accountNumber }) => {
     const existingSubmission = await transaction.get(submissionRef)
     if (existingSubmission.exists()) return { duplicate: true }
 
-    
+    transaction.set(submissionRef, {
+      identifier: normalizedIdentifier,
+      accountNumber,
+      status: 'À traiter',
+      source: 'Formulaire public — démonstration universitaire',
+      createdAt: serverTimestamp(),
+    })
 
     return { duplicate: false }
   })
